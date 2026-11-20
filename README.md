@@ -35,6 +35,14 @@ O script baixa cada tabela da fonte oficial e registra versão e data em `dados/
 
 **CEST:** o site do CONFAZ recusa conexões de fora do Brasil. Rode `python3 scripts/atualizar_dados.py cest` num computador no Brasil para gerar `dados/cest.json`. Sem esse arquivo o sistema funciona, mas não valida CEST.
 
+Se o arquivo foi gerado em outro computador, coloque-o em qualquer pasta e reprocesse com:
+
+```bash
+python3 scripts/atualizar_dados.py importar-cest caminho/do/cest.json
+```
+
+O texto consolidado do CONFAZ traz a redação vigente de cada item seguida das redações anteriores. O script usa a primeira linha de cada CEST, descarta os itens revogados, guarda os NCMs de redações antigas em `ncm_anteriores` e marca os itens do Anexo XXVII (escala industrial não relevante). As linhas lidas sem tratamento ficam em `dados/cest_bruto.json`.
+
 **Alíquotas internas:** as UFs marcadas como `conferir` em `dados/curados/ufs.json` tinham valores divergentes entre as fontes públicas em nov/2026. Confirme no RICMS e ajuste o arquivo.
 
 ## Rodar localmente

@@ -20,6 +20,12 @@ const base = {
   cclassMap: new Map(cclass.itens.map((c) => [c.c, c])),
   cestPorNcm: new Map(),
 };
+if (fs.existsSync(path.join(raiz, "dados/cest.json"))) {
+  for (const c of ler("dados/cest.json").itens) for (const n of new Set([...c.ncm, ...(c.ncm_anteriores || [])])) {
+    if (!base.cestPorNcm.has(n)) base.cestPorNcm.set(n, []);
+    base.cestPorNcm.get(n).push(c);
+  }
+}
 
 const dir = path.join(raiz, "app/exemplos");
 const notas = [], eventos = [];
@@ -45,6 +51,12 @@ assert(tem("5501", "CALC_ICMS", "erro"), "NF 5501: vICMS errado");
 assert(!achados.some((a) => a.nNF === "880" && a.sev !== "verificar"), "NF 880 sem erros");
 assert(!achados.some((a) => a.regra === "CHAVE"), "chaves válidas");
 assert(tem("104", "ESTRUTURA", "verificar"), "NF 104 cancelada");
+if (base.cestPorNcm.size) {
+  assert(tem("101", "CEST", "erro"), "NF 101: item com ST sem CEST");
+  const cands = F.cestCandidatos("22021000", base.cestPorNcm).map((c) => c.cest);
+  assert(cands.includes("0300700"), "22021000 deve apontar o CEST 03.007.00");
+  assert.strictEqual(new Set(cands).size, cands.length, "candidatos sem repetição");
+}
 
 const ap = F.apurar(notas, empresa, base, {});
 console.log("\nICMS", ap.icms, "\nreceita", ap.receita);

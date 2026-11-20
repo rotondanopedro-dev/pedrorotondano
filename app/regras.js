@@ -534,7 +534,7 @@
     const out = [];
     for (let k = 8; k >= 2; k--) {
       const l = cestPorNcm.get(ncm.slice(0, k));
-      if (l) out.push(...l);
+      if (l) for (const c of l) if (!out.some((x) => x.cest === c.cest)) out.push(c);
     }
     return out;
   }

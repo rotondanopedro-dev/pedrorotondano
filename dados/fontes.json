@@ -29,7 +29,15 @@
     "status": "ok"
   },
   "cest": {
-    "status": "falhou",
-    "ultimo_erro": "2026-11-20: <urlopen error [Errno 104] Connection reset by peer>"
+    "registros": 1046,
+    "bytes": 237242,
+    "versao": "baixado em 2026-11-20",
+    "linhas_lidas": 1598,
+    "itens": 1046,
+    "revogados": 8,
+    "com_escala_nao_relevante": 35,
+    "atualizado_em": "2026-11-20",
+    "status": "ok",
+    "origem": "importado de arquivo"
   }
 }

@@ -249,9 +249,87 @@ def atualizar_cest() -> dict:
         })
     if len(itens) < 300:
         raise RuntimeError(f"apenas {len(itens)} itens CEST reconhecidos; leiaute do CONFAZ pode ter mudado")
+    return salvar_cest(itens, hoje())
+
+
+# Segmentos do Anexo I do Convênio ICMS 142/2018 (2 primeiros dígitos do CEST)
+SEGMENTOS_CEST = {
+    "01": "Autopeças", "02": "Bebidas alcoólicas, exceto cerveja e chope",
+    "03": "Cervejas, chopes, refrigerantes, águas e outras bebidas", "04": "Cigarros e outros produtos derivados do fumo",
+    "05": "Cimentos", "06": "Combustíveis e lubrificantes", "07": "Energia elétrica", "08": "Ferramentas",
+    "09": "Lâmpadas, reatores e starter", "10": "Materiais de construção e congêneres", "11": "Materiais de limpeza",
+    "12": "Materiais elétricos", "13": "Medicamentos de uso humano e outros produtos farmacêuticos",
+    "14": "Papéis, plásticos, produtos cerâmicos e vidros", "16": "Pneumáticos, câmaras de ar e protetores de borracha",
+    "17": "Produtos alimentícios", "19": "Produtos de papelaria", "20": "Produtos de perfumaria e de higiene pessoal e cosméticos",
+    "21": "Produtos eletrônicos, eletroeletrônicos e eletrodomésticos", "22": "Rações para animais domésticos",
+    "23": "Sorvetes e preparados para fabricação de sorvetes em máquinas", "24": "Tintas e vernizes",
+    "25": "Veículos automotores", "26": "Veículos de duas e três rodas motorizados",
+    "28": "Venda de mercadorias pelo sistema porta a porta",
+}
+ANEXOS_ST = {"II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI",
+             "XVII", "XVIII", "XIX", "XX", "XXI", "XXII", "XXIII", "XXIV", "XXV", "XXVI"}
+ANEXO_ESCALA_NAO_RELEVANTE = "XXVII"
+
+
+def limpar_cest(brutos: list[dict]) -> tuple[list[dict], dict]:
+    """Organiza as linhas lidas do texto consolidado do CONFAZ.
+
+    O texto consolidado traz a redação vigente de cada item seguida das redações
+    anteriores. Por isso vale a PRIMEIRA linha de cada CEST; as seguintes viram
+    histórico (ncm_anteriores). Itens cuja redação vigente é "Revogado" saem da lista.
+    O Anexo XXVII (escala industrial não relevante) não cria ST: só marca os itens.
+    """
+    principal: dict[str, dict] = {}
+    anteriores: dict[str, set] = {}
+    escala: dict[str, str] = {}
+    revogados = set()
+    for b in brutos:
+        cest, anexo = b["cest"], b.get("anexo", "")
+        revogado = b["desc"].strip().upper().startswith("REVOGAD")
+        if anexo == ANEXO_ESCALA_NAO_RELEVANTE:
+            if cest not in escala:
+                escala[cest] = "" if revogado else b["desc"]
+            continue
+        if anexo not in ANEXOS_ST:
+            continue
+        if cest not in principal and cest not in revogados:
+            if revogado:
+                revogados.add(cest)
+                continue
+            principal[cest] = {"cest": cest, "item": b.get("item", ""), "ncm": list(dict.fromkeys(b["ncm"])),
+                               "desc": b["desc"], "segmento": SEGMENTOS_CEST.get(cest[:2], ""), "anexo": anexo}
+        elif cest in principal:
+            extras = set(b["ncm"]) - set(principal[cest]["ncm"])
+            if extras:
+                anteriores.setdefault(cest, set()).update(extras)
+    itens = []
+    for cest, it in sorted(principal.items()):
+        if cest in anteriores:
+            it["ncm_anteriores"] = sorted(anteriores[cest])
+        if escala.get(cest):
+            it["escala_nao_relevante"] = escala[cest]
+        itens.append(it)
+    resumo = {"linhas_lidas": len(brutos), "itens": len(itens), "revogados": len(revogados),
+              "com_escala_nao_relevante": sum(1 for i in itens if "escala_nao_relevante" in i)}
+    return itens, resumo
+
+
+def salvar_cest(brutos: list[dict], baixado_em: str) -> dict:
+    itens, resumo = limpar_cest(brutos)
+    salvar("cest_bruto.json", {"baixado_em": baixado_em, "brutos": brutos})
     tam = salvar("cest.json", {"fonte": "CONFAZ - Convênio ICMS 142/2018 (Anexos II a XXVI)",
-                               "url": URL_CONFAZ_142, "baixado_em": hoje(), "itens": itens})
-    return {"registros": len(itens), "bytes": tam, "versao": f"baixado em {hoje()}"}
+                               "url": URL_CONFAZ_142, "baixado_em": baixado_em, "resumo": resumo,
+                               "itens": itens})
+    return {"registros": len(itens), "bytes": tam, "versao": f"baixado em {baixado_em}", **resumo}
+
+
+def importar_cest(caminho: str) -> dict:
+    """Reprocessa um cest.json gerado em outro computador (útil quando o CONFAZ bloqueia o acesso)."""
+    dados = json.loads(Path(caminho).read_text(encoding="utf-8"))
+    brutos = dados.get("brutos") or dados["itens"]
+    if brutos and "anexo" not in brutos[0]:
+        raise RuntimeError("arquivo já processado; use o cest_bruto.json ou o arquivo gerado pelo atualizador")
+    return salvar_cest(brutos, dados.get("baixado_em", hoje()))
 
 
 # ---------------------------------------------------------------- principal
@@ -260,6 +338,12 @@ def main(alvos: list[str]) -> int:
     fontes_path = DADOS / "fontes.json"
     fontes = json.loads(fontes_path.read_text(encoding="utf-8")) if fontes_path.exists() else {}
     todos = ["ncm", "cfop", "fcp", "cclasstrib", "cest"]
+    if alvos[:1] == ["importar-cest"]:
+        res = importar_cest(alvos[1])
+        fontes["cest"] = {**res, "atualizado_em": hoje(), "status": "ok", "origem": "importado de arquivo"}
+        fontes_path.write_text(json.dumps(fontes, ensure_ascii=False, indent=2), encoding="utf-8")
+        print(f"[ok]    cest importado: {res}")
+        return 0
     alvos = alvos or todos
     links = None
     falhas = 0

@@ -44,7 +44,7 @@
     }
     for (const c of cfop.itens) B.cfopMap.set(c.c, c);
     for (const c of cclass.itens) B.cclassMap.set(c.c, c);
-    if (cest && cest.itens) for (const c of cest.itens) for (const n of c.ncm) { if (!B.cestPorNcm.has(n)) B.cestPorNcm.set(n, []); B.cestPorNcm.get(n).push(c); }
+    if (cest && cest.itens) for (const c of cest.itens) for (const n of new Set([...c.ncm, ...(c.ncm_anteriores || [])])) { if (!B.cestPorNcm.has(n)) B.cestPorNcm.set(n, []); B.cestPorNcm.get(n).push(c); }
   }
 
   function caminhoNcm(cod) {
@@ -180,7 +180,11 @@
     html += `<div class="painel pilha"><h3>CEST e substituição tributária</h3>`;
     if (!B.cest) html += `<p class="mudo">A tabela CEST do Convênio ICMS 142/2018 ainda não foi carregada: o site do CONFAZ só responde a acessos do Brasil. Rode <code>python3 scripts/atualizar_dados.py cest</code> num computador no Brasil para incluí-la.</p>`;
     else if (!cestDoNcm.length) html += `<p>Este NCM não aparece nos anexos do Convênio ICMS 142/2018. Em regra não há ST nem CEST.</p>`;
-    else html += `<div class="tabela"><table><thead><tr><th>CEST</th><th>Segmento</th><th>Descrição</th></tr></thead><tbody>${cestDoNcm.map((c) => `<tr><td class="mono">${c.cest.slice(0, 2)}.${c.cest.slice(2, 5)}.${c.cest.slice(5)}</td><td>${esc(c.segmento)}</td><td>${esc(c.desc)}</td></tr>`).join("")}</tbody></table></div>`;
+    else {
+      const unicos = [...new Map(cestDoNcm.map((c) => [c.cest, c])).values()];
+      html += `<p>Este NCM aparece em ${unicos.length} item(ns) do Convênio ICMS 142/2018. Escolha o CEST pela descrição do produto: a ST só se aplica se ${p.ufD} adotar o segmento e houver convênio ou protocolo${r.interna ? "" : ` entre ${p.ufO} e ${p.ufD}`}.</p>
+      <div class="tabela"><table><thead><tr><th>CEST</th><th>Segmento</th><th>Descrição</th><th>NCM no convênio</th></tr></thead><tbody>${unicos.map((c) => `<tr><td class="mono">${c.cest.slice(0, 2)}.${c.cest.slice(2, 5)}.${c.cest.slice(5)}</td><td>${esc(c.segmento)}</td><td>${esc(c.desc)}${c.escala_nao_relevante ? `<br><span class="chip verificar">escala não relevante</span> <span class="pequeno mudo">Sem ST se fabricado em escala industrial não relevante (Anexo XXVII)${semAcento(c.escala_nao_relevante).replace(/\W/g, "") === semAcento(c.desc).replace(/\W/g, "") ? "" : ": " + esc(c.escala_nao_relevante)}</span>` : ""}</td><td class="mono pequeno">${c.ncm.map(F.fmtNcm).join(", ")}${c.ncm_anteriores ? `<br><span class="mudo">antes: ${c.ncm_anteriores.map(F.fmtNcm).join(", ")}</span>` : ""}</td></tr>`).join("")}</tbody></table></div>`;
+    }
     html += calculadoraST(r, p);
     html += `</div>`;
 
