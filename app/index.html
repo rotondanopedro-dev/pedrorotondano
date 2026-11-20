@@ -1,0 +1,272 @@
+<meta charset="utf-8">
+<title>Central Fiscal ICMS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: barra de abas fixa no topo; cada aba é uma mesa de trabalho em grade de 2 colunas (formulário | resultado) que vira 1 coluna no celular. */
+:root {
+  --bg: #F3F5F7; --surface: #FFFFFF; --surface-2: #EEF2F4; --ink: #15202A; --muted: #586674; --line: #D8DEE4;
+  --accent: #0D6B66; --accent-soft: #DDEFED; --accent-ink: #FFFFFF;
+  --err: #B42318; --err-soft: #FDECEA; --warn: #A15C07; --warn-soft: #FEF3E2; --info: #1D5BBF; --info-soft: #E7EFFC; --ok: #087443; --ok-soft: #E3F4EA;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 8px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0E151B; --surface: #151E26; --surface-2: #1B2630; --ink: #E4EAEF; --muted: #93A2AF; --line: #283541;
+  --accent: #3DB5AC; --accent-soft: #15302F; --accent-ink: #062321;
+  --err: #F97066; --err-soft: #3A1714; --warn: #F5B544; --warn-soft: #36270E; --info: #84ADFF; --info-soft: #172640; --ok: #4CCB8A; --ok-soft: #0F2E1F;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0E151B; --surface: #151E26; --surface-2: #1B2630; --ink: #E4EAEF; --muted: #93A2AF; --line: #283541;
+  --accent: #3DB5AC; --accent-soft: #15302F; --accent-ink: #062321;
+  --err: #F97066; --err-soft: #3A1714; --warn: #F5B544; --warn-soft: #36270E; --info: #84ADFF; --info-soft: #172640; --ok: #4CCB8A; --ok-soft: #0F2E1F;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.5; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+a { color: var(--accent); }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; line-height: 1.2; }
+h2 { font-size: 1.35rem; font-weight: 600; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+code, .mono { font-family: var(--f-mono); font-size: .92em; }
+.num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; padding-block: 10px; }
+.marca { display: flex; align-items: baseline; gap: 10px; }
+.marca h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: .01em; }
+.marca .selo { font-family: var(--f-mono); font-size: 11px; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 1px 6px; letter-spacing: .06em; }
+nav.abas { display: flex; gap: 4px; flex-wrap: wrap; }
+nav.abas a { text-decoration: none; color: var(--muted); padding: 6px 12px; border-radius: 6px; font-weight: 500; }
+nav.abas a:hover { background: var(--surface-2); color: var(--ink); }
+nav.abas a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+nav.abas a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+main { padding-block: 24px 64px; }
+section.aba { display: grid; gap: 20px; }
+.cab-aba { display: flex; gap: 16px; align-items: end; justify-content: space-between; flex-wrap: wrap; }
+.cab-aba p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+.grade { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grade { grid-template-columns: minmax(0, 1fr); } }
+.painel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; min-width: 0; }
+.painel > h3 { margin-bottom: 12px; }
+.pilha { display: grid; gap: 14px; min-width: 0; }
+
+label.campo { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); font-weight: 500; }
+input[type="text"], input[type="number"], input[type="search"], select { font: inherit; font-size: 14px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0; }
+input[type="number"] { font-variant-numeric: tabular-nums; }
+.linha2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.linha3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 480px) { .linha3 { grid-template-columns: 1fr 1fr; } }
+button { font: inherit; font-weight: 500; border-radius: 6px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+button:hover { background: var(--surface-2); }
+button.prim { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.prim:hover { filter: brightness(1.06); }
+button.peq { padding: 4px 10px; font-size: 12.5px; }
+.acoes { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.resultados-ncm { border: 1px solid var(--line); border-radius: 6px; max-height: 280px; overflow: auto; background: var(--surface); }
+.resultados-ncm button { display: grid; grid-template-columns: 92px 1fr; gap: 8px; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; padding: 7px 10px; font-weight: 400; }
+.resultados-ncm button:last-child { border-bottom: 0; }
+.resultados-ncm button[aria-selected="true"] { background: var(--accent-soft); }
+.resultados-ncm .cod { font-family: var(--f-mono); color: var(--accent); }
+.resultados-ncm .vazio { padding: 10px; color: var(--muted); }
+
+.ficha-ncm { display: grid; gap: 6px; }
+.ficha-ncm .codigo { font-family: var(--f-mono); font-size: 1.6rem; font-weight: 500; letter-spacing: .02em; }
+.caminho { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; font-size: 13px; color: var(--muted); }
+.caminho li { padding-left: calc(var(--n) * 12px); }
+.caminho li:last-child { color: var(--ink); font-weight: 500; }
+
+.quadro { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.quadro > div { background: var(--surface); padding: 12px 14px; display: grid; gap: 2px; align-content: start; min-width: 0; }
+.quadro .rot { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 500; }
+.quadro .val { font-family: var(--f-mono); font-size: 1.35rem; font-weight: 500; }
+.quadro .sub { font-size: 12.5px; color: var(--muted); }
+
+.notas { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.notas li { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; font-size: 13.5px; }
+.chip { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.chip.erro { background: var(--err-soft); color: var(--err); }
+.chip.alerta { background: var(--warn-soft); color: var(--warn); }
+.chip.verificar { background: var(--info-soft); color: var(--info); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); }
+.chip.neutro { background: var(--surface-2); color: var(--muted); }
+
+.tabela { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: var(--surface-2); position: sticky; top: 0; }
+tbody tr:last-child td { border-bottom: 0; }
+tfoot td { font-weight: 600; background: var(--surface-2); }
+td.sev { width: 1%; }
+.trunc { max-width: 340px; }
+
+.zona-upload { border: 2px dashed var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 8px; justify-items: center; text-align: center; background: var(--surface); }
+.zona-upload.ativa { border-color: var(--accent); background: var(--accent-soft); }
+.zona-upload p { margin: 0; color: var(--muted); }
+.faixa { border-radius: var(--r); padding: 10px 14px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.faixa.exemplo { background: var(--info-soft); color: var(--info); }
+.faixa.aviso { background: var(--warn-soft); color: var(--warn); }
+.contadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.contador { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; }
+.contador .n { font-family: var(--f-mono); font-size: 1.5rem; font-weight: 500; }
+.contador .r { font-size: 12px; color: var(--muted); }
+.contador.erro { border-left: 3px solid var(--err); }
+.contador.alerta { border-left: 3px solid var(--warn); }
+.contador.verificar { border-left: 3px solid var(--info); }
+.filtros { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filtros select, .filtros input { width: auto; }
+.filtros input[type="search"] { min-width: 0; flex: 1 1 200px; }
+.sub-abas { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.sub-abas button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; color: var(--muted); padding: 8px 12px; }
+.sub-abas button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.mudo { color: var(--muted); }
+.pequeno { font-size: 12.5px; }
+details summary { cursor: pointer; font-weight: 500; }
+.toast { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 6px; font-size: 13px; z-index: 20; }
+.carregando { padding: 40px 0; text-align: center; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .painel, .tabela { transition: border-color .15s; } }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="marca"><h1>Central Fiscal ICMS</h1><span class="selo">NF-e · ICMS · IBS/CBS</span></div>
+    <nav class="abas" aria-label="Seções">
+      <a href="#consulta" data-aba="consulta">Consulta por NCM</a>
+      <a href="#auditoria" data-aba="auditoria">Auditoria de XML</a>
+      <a href="#apuracao" data-aba="apuracao">Apuração</a>
+      <a href="#base" data-aba="base">Base de dados</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="carregando" class="carregando">Carregando tabelas oficiais (NCM, CFOP, FCP, IBS/CBS)…</div>
+
+  <!-- ===================== CONSULTA ===================== -->
+  <section class="aba" id="aba-consulta" hidden>
+    <div class="cab-aba">
+      <div>
+        <h2>Parametrização de produto</h2>
+        <p>Escolha o NCM e a operação. O resultado traz CFOP, CST/CSOSN, alíquotas, DIFAL, FCP e IBS/CBS, com os pontos que precisam de conferência na legislação do estado.</p>
+      </div>
+    </div>
+    <div class="grade">
+      <div class="pilha">
+        <div class="painel pilha">
+          <h3>1. Produto</h3>
+          <label class="campo" for="busca-ncm">Código NCM ou descrição
+            <input type="search" id="busca-ncm" placeholder="Ex.: 6109.10.00 ou camiseta algodão" autocomplete="off">
+          </label>
+          <div class="resultados-ncm" id="lista-ncm" role="listbox" aria-label="NCMs encontrados"></div>
+        </div>
+        <form class="painel pilha" id="form-op">
+          <h3>2. Operação</h3>
+          <div class="linha2">
+            <label class="campo" for="op-uf-o">UF de origem<select id="op-uf-o"></select></label>
+            <label class="campo" for="op-uf-d">UF de destino<select id="op-uf-d"></select></label>
+          </div>
+          <label class="campo" for="op-regime">Regime do vendedor
+            <select id="op-regime">
+              <option value="LP">Lucro Presumido (regime normal)</option>
+              <option value="SN">Simples Nacional</option>
+            </select>
+          </label>
+          <label class="campo" for="op-dest">Destinatário
+            <select id="op-dest">
+              <option value="revenda">Contribuinte do ICMS, para revenda ou industrialização</option>
+              <option value="uso">Contribuinte do ICMS, para uso, consumo ou ativo</option>
+              <option value="naocontrib">Não contribuinte ou consumidor final (pessoa física, órgão público, isento de IE)</option>
+            </select>
+          </label>
+          <div class="linha2">
+            <label class="campo" for="op-prod">Mercadoria
+              <select id="op-prod">
+                <option value="revenda">Adquirida de terceiros (revenda)</option>
+                <option value="propria">Produção própria</option>
+              </select>
+            </label>
+            <label class="campo" for="op-orig">Origem (1º dígito do CST)<select id="op-orig"></select></label>
+          </div>
+          <label class="campo" for="op-st">Substituição tributária
+            <select id="op-st">
+              <option value="nao">Produto sem ST nesta operação</option>
+              <option value="substituido">ST já retida anteriormente (sou substituído)</option>
+              <option value="substituto">Eu retenho o ICMS-ST (sou substituto)</option>
+            </select>
+          </label>
+          <p class="pequeno mudo" id="dica-st"></p>
+        </form>
+      </div>
+      <div class="pilha" id="resultado-consulta"></div>
+    </div>
+  </section>
+
+  <!-- ===================== AUDITORIA ===================== -->
+  <section class="aba" id="aba-auditoria" hidden>
+    <div class="cab-aba">
+      <div>
+        <h2>Auditoria de XML</h2>
+        <p>Envie XMLs de NF-e e NFC-e (soltos ou em .zip, incluindo eventos de cancelamento). A leitura acontece no seu navegador e nenhum arquivo é enviado a servidores.</p>
+      </div>
+      <div class="acoes">
+        <button type="button" id="btn-exemplo">Carregar exemplo</button>
+        <button type="button" id="btn-limpar">Limpar</button>
+      </div>
+    </div>
+    <label class="zona-upload" id="zona-upload" for="arquivos">
+      <strong>Arraste os XMLs ou um .zip aqui</strong>
+      <p>ou clique para escolher os arquivos</p>
+      <input type="file" id="arquivos" accept=".xml,.zip,text/xml,application/zip" multiple hidden>
+    </label>
+    <div id="faixa-auditoria"></div>
+    <div class="painel pilha" id="painel-empresa" hidden>
+      <div class="linha3">
+        <label class="campo" for="emp-cnpj">Empresa auditada<select id="emp-cnpj"></select></label>
+        <label class="campo" for="emp-regime">Regime da empresa
+          <select id="emp-regime">
+            <option value="LP">Lucro Presumido</option>
+            <option value="SN">Simples Nacional</option>
+          </select>
+        </label>
+        <label class="campo" for="emp-uf">UF da empresa<select id="emp-uf"></select></label>
+      </div>
+    </div>
+    <div id="resultado-auditoria" class="pilha"></div>
+  </section>
+
+  <!-- ===================== APURAÇÃO ===================== -->
+  <section class="aba" id="aba-apuracao" hidden>
+    <div class="cab-aba">
+      <div>
+        <h2>Apuração</h2>
+        <p>Resumo para apuração do ICMS próprio, ICMS-ST, DIFAL, FCP, PIS/COFINS, IPI e IBS/CBS, a partir dos XMLs da aba Auditoria. Notas canceladas e denegadas ficam de fora.</p>
+      </div>
+    </div>
+    <div id="resultado-apuracao" class="pilha"></div>
+  </section>
+
+  <!-- ===================== BASE ===================== -->
+  <section class="aba" id="aba-base" hidden>
+    <div class="cab-aba">
+      <div>
+        <h2>Base de dados</h2>
+        <p>Tabelas oficiais usadas pelo sistema, com a versão e a data de cada uma. Para atualizar, rode <code>python3 scripts/atualizar_dados.py</code> e publique de novo.</p>
+      </div>
+    </div>
+    <div id="resultado-base" class="pilha"></div>
+  </section>
+</main>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="regras.js"></script>
+<script src="app.js"></script>

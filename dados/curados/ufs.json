@@ -1,0 +1,49 @@
+{
+  "descricao": "Dados por UF mantidos manualmente. Alíquota interna = alíquota modal (geral) do ICMS, sem FCP. Produtos com alíquota específica (combustíveis, energia, cesta básica, supérfluos etc.) seguem o RICMS de cada estado.",
+  "revisado_em": "2026-11-20",
+  "status_legenda": {
+    "conferido": "Valor igual em todas as tabelas consultadas em nov/2026",
+    "conferir": "Fontes divergem; confirme no RICMS/SEFAZ antes de usar"
+  },
+  "fontes_consulta": [
+    "https://www.jettax.com.br/blog/aliquota-de-icms-por-estado-em-2026-tabela-interna-e-interestadual/",
+    "https://www.ncmbrasil.com.br/icms",
+    "https://conteudo.fiscal.io/tabela-difal-2026-aliquotas/"
+  ],
+  "cbenef_fonte": "Estados que publicam tabela própria de cBenef (código de benefício fiscal) para NF-e/NFC-e, segundo os portais das SEFAZ consultados em nov/2026.",
+  "ufs": {
+    "AC": {"nome": "Acre", "cUF": 12, "regiao": "N", "aliq_interna": 19, "status": "conferido", "sefaz": "https://sefaz.ac.gov.br/"},
+    "AL": {"nome": "Alagoas", "cUF": 27, "regiao": "NE", "aliq_interna": 20.5, "status": "conferido", "historico": [{"aliq": 19, "ate": "2026-03-31"}], "obs": "19% até 31/03/2026; 20,5% a partir de 01/04/2026.", "sefaz": "https://www.sefaz.al.gov.br/"},
+    "AP": {"nome": "Amapá", "cUF": 16, "regiao": "N", "aliq_interna": 18, "status": "conferido", "sefaz": "https://www.sefaz.ap.gov.br/"},
+    "AM": {"nome": "Amazonas", "cUF": 13, "regiao": "N", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.sefaz.am.gov.br/"},
+    "BA": {"nome": "Bahia", "cUF": 29, "regiao": "NE", "aliq_interna": 20.5, "status": "conferir", "obs": "Algumas tabelas ainda mostram 19%.", "sefaz": "https://www.sefaz.ba.gov.br/"},
+    "CE": {"nome": "Ceará", "cUF": 23, "regiao": "NE", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.sefaz.ce.gov.br/"},
+    "DF": {"nome": "Distrito Federal", "cUF": 53, "regiao": "CO", "aliq_interna": 20, "status": "conferido", "cbenef": true, "sefaz": "https://www.receita.fazenda.df.gov.br/"},
+    "ES": {"nome": "Espírito Santo", "cUF": 32, "regiao": "SE", "aliq_interna": 17, "status": "conferido", "cbenef": true, "cbenef_url": "https://sefaz.es.gov.br/codigos-de-beneficios-fiscais-cbenef", "sefaz": "https://sefaz.es.gov.br/"},
+    "GO": {"nome": "Goiás", "cUF": 52, "regiao": "CO", "aliq_interna": 19, "status": "conferido", "cbenef": true, "cbenef_url": "https://goias.gov.br/economia/codigos-de-beneficios-fiscais/", "obs": "O ICMS é regulamentado pelo RCTE (Decreto 4.852/1997).", "sefaz": "https://goias.gov.br/economia/"},
+    "MA": {"nome": "Maranhão", "cUF": 21, "regiao": "NE", "aliq_interna": 23, "status": "conferir", "obs": "Uma das tabelas consultadas mostra 22%.", "sefaz": "https://sistemas1.sefaz.ma.gov.br/portalsefaz/"},
+    "MT": {"nome": "Mato Grosso", "cUF": 51, "regiao": "CO", "aliq_interna": 17, "status": "conferido", "sefaz": "https://www5.sefaz.mt.gov.br/"},
+    "MS": {"nome": "Mato Grosso do Sul", "cUF": 50, "regiao": "CO", "aliq_interna": 17, "status": "conferido", "sefaz": "https://www.sefaz.ms.gov.br/"},
+    "MG": {"nome": "Minas Gerais", "cUF": 31, "regiao": "SE", "aliq_interna": 18, "status": "conferido", "ricms": "https://www.fazenda.mg.gov.br/empresas/legislacao_tributaria/ricms_2023_seco/sumario2023_1.html", "obs": "RICMS/2023 (Decreto 48.589/2023).", "sefaz": "https://www.fazenda.mg.gov.br/"},
+    "PA": {"nome": "Pará", "cUF": 15, "regiao": "N", "aliq_interna": 19, "status": "conferido", "sefaz": "https://www.sefa.pa.gov.br/"},
+    "PB": {"nome": "Paraíba", "cUF": 25, "regiao": "NE", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.sefaz.pb.gov.br/"},
+    "PR": {"nome": "Paraná", "cUF": 41, "regiao": "S", "aliq_interna": 19.5, "status": "conferir", "cbenef": true, "obs": "Tabelas divergem entre 19% e 19,5%.", "sefaz": "https://www.fazenda.pr.gov.br/"},
+    "PE": {"nome": "Pernambuco", "cUF": 26, "regiao": "NE", "aliq_interna": 20.5, "status": "conferido", "sefaz": "https://www.sefaz.pe.gov.br/"},
+    "PI": {"nome": "Piauí", "cUF": 22, "regiao": "NE", "aliq_interna": 22.5, "status": "conferir", "obs": "Tabelas divergem entre 21%, 22% e 22,5%.", "sefaz": "https://portal.sefaz.pi.gov.br/"},
+    "RJ": {"nome": "Rio de Janeiro", "cUF": 33, "regiao": "SE", "aliq_interna": 20, "status": "conferir", "cbenef": true, "obs": "20% + 2% de FECP = 22% de carga efetiva na maioria das mercadorias.", "sefaz": "https://www.fazenda.rj.gov.br/"},
+    "RN": {"nome": "Rio Grande do Norte", "cUF": 24, "regiao": "NE", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.set.rn.gov.br/"},
+    "RS": {"nome": "Rio Grande do Sul", "cUF": 43, "regiao": "S", "aliq_interna": 17, "status": "conferido", "cbenef": true, "sefaz": "https://receita.fazenda.rs.gov.br/"},
+    "RO": {"nome": "Rondônia", "cUF": 11, "regiao": "N", "aliq_interna": 19.5, "status": "conferir", "obs": "Tabelas divergem entre 17,5% e 19,5%.", "ricms": "https://www.sefin.ro.gov.br/portalsefin/anexos/D18-22721--NOVO-RICMS-RO.pdf", "sefaz": "https://www.sefin.ro.gov.br/"},
+    "RR": {"nome": "Roraima", "cUF": 14, "regiao": "N", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.sefaz.rr.gov.br/"},
+    "SC": {"nome": "Santa Catarina", "cUF": 42, "regiao": "S", "aliq_interna": 17, "status": "conferido", "cbenef": true, "sefaz": "https://www.sef.sc.gov.br/"},
+    "SP": {"nome": "São Paulo", "cUF": 35, "regiao": "SE", "aliq_interna": 18, "status": "conferido", "cbenef": true, "cbenef_url": "https://portal.fazenda.sp.gov.br/servicos/nfe/Paginas/cBenef.aspx", "ricms": "https://legislacao.fazenda.sp.gov.br/Paginas/dec45490.aspx", "obs": "RICMS/SP (Decreto 45.490/2000). cBenef exigido em 2026; confirme a data de início no portal da SEFAZ-SP.", "sefaz": "https://portal.fazenda.sp.gov.br/"},
+    "SE": {"nome": "Sergipe", "cUF": 28, "regiao": "NE", "aliq_interna": 19, "status": "conferir", "obs": "Uma das tabelas consultadas mostra 22%.", "sefaz": "https://www.sefaz.se.gov.br/"},
+    "TO": {"nome": "Tocantins", "cUF": 17, "regiao": "N", "aliq_interna": 20, "status": "conferido", "sefaz": "https://www.to.gov.br/sefaz"}
+  },
+  "regras_interestaduais": {
+    "fonte": "Resolução do Senado Federal 22/1989 (7% e 12%) e Resolução do Senado Federal 13/2012 (4% para importados)",
+    "sete_por_cento": "Origem Sul ou Sudeste (exceto ES) com destino Norte, Nordeste, Centro-Oeste ou Espírito Santo",
+    "doze_por_cento": "Demais operações interestaduais",
+    "quatro_por_cento": "Mercadoria importada ou com conteúdo de importação acima de 40% (origem 1, 2, 3 ou 8), salvo as exceções da Resolução 13/2012 (origens 6 e 7: sem similar nacional na lista da CAMEX; gás natural importado)"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "central-fiscal-icms",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Consulta de parametrização de ICMS por NCM, auditoria de XML de NF-e/NFC-e e apuração de impostos.",
+  "scripts": {
+    "test": "node testes/testar_regras.js",
+    "dados": "python3 scripts/atualizar_dados.py",
+    "exemplos": "python3 scripts/gerar_exemplos.py",
+    "servir": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "@xmldom/xmldom": "0.8.10"
+  }
+}

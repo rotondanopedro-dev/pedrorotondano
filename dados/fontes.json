@@ -1,0 +1,35 @@
+{
+  "ncm": {
+    "registros": 15157,
+    "ncm_8_digitos": 10516,
+    "bytes": 1468406,
+    "versao": "Vigente em 20/11/2026 (Resolução Gecex nº 926/2026)",
+    "atualizado_em": "2026-11-20",
+    "status": "ok"
+  },
+  "cfop": {
+    "registros": 619,
+    "bytes": 260689,
+    "versao": "Tabela de CFOP - Publicada em 04/09/2026",
+    "atualizado_em": "2026-11-20",
+    "status": "ok"
+  },
+  "fcp": {
+    "registros": 27,
+    "bytes": 2578,
+    "versao": "Tabela de Alíquotas de FCP por UF (atualizada em 25/02/2025)",
+    "atualizado_em": "2026-11-20",
+    "status": "ok"
+  },
+  "cclasstrib": {
+    "registros": 173,
+    "bytes": 40105,
+    "versao": "Tabela de Classificação Tributária do IBS e CBS - Publicada em 30/10/2026 (aba cClass 2026-09-01)",
+    "atualizado_em": "2026-11-20",
+    "status": "ok"
+  },
+  "cest": {
+    "status": "falhou",
+    "ultimo_erro": "2026-11-20: <urlopen error [Errno 104] Connection reset by peer>"
+  }
+}
